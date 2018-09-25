@@ -3,7 +3,10 @@ var path = require('path');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var neo4j = require('neo4j-driver').v1;
-var config = require('./test.json');
+var fs = require('fs');
+var data = fs.readFileSync('test.json','utf8');
+var words = JSON.parse(data);
+
 
 var app = express();
 
@@ -76,11 +79,9 @@ app.post('/node1/add',function(req,res){
 
 app.post('/node3/add',function(req,res){
     var val23 = req.body.Node3_val;
-    console.log(config.firstName + ' ' + config.lastName);
-    var val23 = config.firstName;
-    //console.log(val);
+    //console.log(words.name);
     session
-        .run('CREATE (n:Node3 {val:{value2}}) RETURN n.val',{value2:val23})
+        .run('WITH "file:///U:/myapp/test.json" AS url CALL apoc.load.json(url) YIELD value as row CREATE (:Node3 {val:row.color,id:row.value})')
         .then(function(result){
             res.redirect('/');
     
