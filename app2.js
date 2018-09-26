@@ -3,6 +3,10 @@ var path = require('path');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var neo4j = require('neo4j-driver').v1;
+var fs = require('fs');
+var data = fs.readFileSync('test.json','utf8');
+var words = JSON.parse(data);
+
 
 var app = express();
 
@@ -20,27 +24,25 @@ var session = driver.session();
 
 app.get('/',function(req,res){
     session
-        .run('MATCH (n:Cake) Return n limit 25')
+        .run('MATCH (n:Node1) Return n limit 25')
         .then(function(result){
             var movieArr = [];
             result.records.forEach(function(record){
                 movieArr.push({
                     id: record._fields[0].identity.low,
-                    val: record._fields[0].properties.val,
-                    ids: record._fields[0].properties.id
+                    val: record._fields[0].properties.val
                    // year: record._fields[0].properties.year
                 });
             });
 
             session
-                .run('MATCH(n:Topping) Return n limit 25')
+                .run('MATCH(n:Node3) Return n limit 25')
                 .then(function(result2){
                     var actorArr = [];
                     result2.records.forEach(function(record){
                         actorArr.push({
                             id: record._fields[0].identity.low,
-                            val: record._fields[0].properties.val,
-                            ids: record._fields[0].properties.id
+                            val: record._fields[0].properties.val
                         });
                     });
                     res.render('index',{
@@ -58,17 +60,12 @@ app.get('/',function(req,res){
     //res.send('It works');
 });
 
-app.post('/node/add',function(req,res){
-    var upload_file = req.body.Node_file;
-    var upload = "file:///U:/myapp/".concat(upload_file)
-
-    var label = req.body.Node_label;
-    var properties = req.body.Node_pro;
-
+app.post('/node1/add',function(req,res){
+    var val = req.body.Node1_val;
+    //var obj = JSON.parse(fs.readFileSync('trialdata.json', 'utf8'));
+    
     session
-        .run("CREATE CONSTRAINT ON (m:"+label+") ASSERT m.id IS UNIQUE;")
-    session
-        .run("WITH {files} AS url CALL apoc.load.json(url) YIELD value as row CREATE (:"+label+" {"+ properties +":row.id, name:row.name})",{files:upload})
+        .run('CREATE (n:Node1 {val:{value}}) RETURN n.val',{value:val})
         .then(function(result){
             res.redirect('/');
     
@@ -80,18 +77,11 @@ app.post('/node/add',function(req,res){
     res.redirect('/');
 });
 
-app.post('/subnode/add',function(req,res){
-    var upload_file = req.body.SubNode_file;
-    var upload = "file:///U:/myapp/".concat(upload_file)
-
-    var label = req.body.SubNode_label;
-    var properties = req.body.SubNode_pro;
-
+app.post('/node3/add',function(req,res){
+    var val23 = req.body.Node3_val;
+    //console.log(words.name);
     session
-        .run("CREATE CONSTRAINT ON (m:"+label+") ASSERT m.id IS UNIQUE;")
-
-    session
-        .run("WITH {files} AS url CALL apoc.load.json(url) YIELD value as row UNWIND row.topping as top MERGE (:"+label+" {"+ properties +":top.id, type:top.type})",{files:upload})
+        .run('WITH "file:///U:/myapp/test.json" AS url CALL apoc.load.json(url) YIELD value as row CREATE (:Node3 {val:row.color,id:row.value})')
         .then(function(result){
             res.redirect('/');
     
@@ -102,40 +92,14 @@ app.post('/subnode/add',function(req,res){
         });
     res.redirect('/');
 });
-
-
-app.post('/node/del',function(req,res){
-    var label = req.body.Node_label;
-
-    session
-        .run("MATCH (n:"+label+") DETACH DELETE n")
-        .then(function(result){
-            res.redirect('/');
-    
-            session.close();
-        })
-        .catch(function(err){
-            console.log(err);
-        });
-    res.redirect('/');
-});
-
-
 
 app.post('/node1/node3/add',function(req,res){
     var valin1 = req.body.Node1_val;
     var valin3 = req.body.Node3_val;
-    
-    var relation = req.body.Node_rel;
 
-    var upload_file = req.body.Node_file;
-    var upload = "file:///U:/myapp/".concat(upload_file)
-
-    //('MATCH (n:Node1 {val:{value1}}),(m:Node3 {val:{value3}}) MERGE (m:Node1)-[:belong]->(n:Node3) RETURN n,m',{value1:valin1,value3:valin3})
+    //console.log(val);
     session
-        .run('WITH {files} AS url'+
-        ' CALL apoc.load.json(url) YIELD value as row UNWIND row.topping as top'+
-        ' WITH row,top MATCH (m:Topping) WHERE m.id = top.id MATCH (n:Cake) WHERE n.id = row.id MERGE (m)-[:'+relation+']->(n)',{files:upload})
+        .run('MATCH (n:Node1 {val:{value1}}),(m:Node3 {val:{value3}}) MERGE (m)-[:belong]->(n) RETURN n,m',{value1:valin1,value3:valin3})
         .then(function(result){
             res.redirect('/');
     
