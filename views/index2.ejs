@@ -1,0 +1,66 @@
+<h3>Add Node</h3>
+<form method="post" action="/node/add">
+    <label>File</label><br>
+    <input type="text" name="Node_file"><br>
+    <label>Label</label><br>
+    <input type="text" name="Node_label"><br>
+    <label>Properties</label><br>
+    <input type="text" name="Node_pro">
+    <br><br>
+    <input type="submit" value="Submit">
+</form>
+
+<h3>Add SubNode</h3>
+<form method="post" action="/subnode/add">
+    <label>File</label><br>
+    <input type="text" name="SubNode_file"><br>
+    <label>Label</label><br>
+    <input type="text" name="SubNode_label"><br>
+    <label>Properties</label><br>
+    <input type="text" name="SubNode_pro">
+    <br><br>
+    <input type="submit" value="Submit">
+</form>
+
+<h3>Delete Node</h3>
+<form method="post" action="/node/del">
+    <label>Label</label><br>
+    <input type="text" name="Node_label">
+    <br><br>
+    <input type="submit" value="Submit">
+</form>
+
+
+
+<h3>Add Node3 to Node1</h3>
+<form method="post" action="/node1/node3/add">
+    <label>Node1 val name</label><br>
+    <input type="text" name="Node1_val"><br>
+    <label>Node3 val name</label><br>
+    <input type="text" name="Node3_val"><br>
+    <label>Relationship Name</label><br>
+    <input type="text" name="Node_rel"><br>
+    <label>File Name</label><br>
+    <input type="text" name="Node_file">
+    <br><br>
+    <input type="submit" value="Submit">
+</form>
+
+
+
+
+<h3>Resulting Cake .. Yo </h3>
+<ul>    
+<% movies.forEach(function(movie){ %>
+    <li><%= movie.ids %></li>
+<% }) %>
+</ul>
+
+<h3>Resulting Topping .. Yo </h3>
+<ul>    
+<% actors.forEach(function(movie){ %>
+    <li><%= movie.ids %></li>
+<% }) %>
+</ul>
+
+

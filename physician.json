@@ -1,0 +1,70 @@
+[
+	{
+		"id": "0001",
+		"type": "donut",
+		"name": "Cake",
+		"ppu": 0.55,
+		"batters":
+			{
+				"batter":
+					[
+						{ "id": "1001", "type": "Regular" },
+						{ "id": "1002", "type": "Chocolate" },
+						{ "id": "1003", "type": "Blueberry" },
+						{ "id": "1004", "type": "Devil's Food" }
+					]
+			},
+		"Specialty":
+			[
+				{ "name": "5001", "Subspecialty": "None" },
+				{ "name": "5002", "Subspecialty": "Glazed" },
+				{ "name": "5005", "Subspecialty": "Sugar" },
+				{ "name": "5007", "Subspecialty": "Powdered Sugar" },
+				{ "name": "5006", "Subspecialty": "Chocolate with Sprinkles" },
+				{ "name": "5003", "Subspecialty": "Chocolate" },
+				{ "name": "5004", "Subspecialty": "Maple" }
+			]
+	},
+	{
+		"id": "0002",
+		"type": "donut",
+		"name": "Raised",
+		"ppu": 0.55,
+		"batters":
+			{
+				"batter":
+					[
+						{ "id": "1001", "type": "Regular" }
+					]
+			},
+		"Specialty":
+			[
+				{ "name": "5001", "Subspecialty": "None" },
+				{ "name": "5002", "Subspecialty": "Glazed" },
+				{ "name": "5005", "Subspecialty": "Sugar" },
+				{ "name": "5003", "Subspecialty": "Chocolate" },
+				{ "name": "5004", "Subspecialty": "Maple" }
+			]
+	},
+	{
+		"id": "0003",
+		"type": "donut",
+		"name": "Old Fashioned",
+		"ppu": 0.55,
+		"batters":
+			{
+				"batter":
+					[
+						{ "id": "1001", "type": "Regular" },
+						{ "id": "1002", "type": "Chocolate" }
+					]
+			},
+		"Specialty":
+			[
+				{ "name": "5001", "Subspecialty": "None" },
+				{ "name": "5002", "Subspecialty": "Glazed" },
+				{ "name": "5003", "Subspecialty": "Chocolate" },
+				{ "name": "5004", "Subspecialty": "Maple" }
+			]
+	}
+]

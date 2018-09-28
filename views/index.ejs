@@ -1,25 +1,25 @@
-<h3>Add Node</h3>
-<form method="post" action="/node/add">
+<h3>Add Specialty</h3>
+<form method="post" action="/spcl/add">
     <label>File</label><br>
-    <input type="text" name="Node_file"><br>
-    <label>Label</label><br>
-    <input type="text" name="Node_label"><br>
-    <label>Properties</label><br>
-    <input type="text" name="Node_pro">
+    <input type="text" name="spcl_file"><br>
     <br><br>
-    <input type="submit" value="Submit">
+    <input type="submit" value="Specialty">
 </form>
 
-<h3>Add SubNode</h3>
-<form method="post" action="/subnode/add">
+<h3>Add Subspecialty</h3>
+<form method="post" action="/subspcl/add">
     <label>File</label><br>
-    <input type="text" name="SubNode_file"><br>
-    <label>Label</label><br>
-    <input type="text" name="SubNode_label"><br>
-    <label>Properties</label><br>
-    <input type="text" name="SubNode_pro">
+    <input type="text" name="subspcl_file"><br>
     <br><br>
-    <input type="submit" value="Submit">
+    <input type="submit" value="Subspecialty">
+</form>
+
+<h3>Add Diagnosis</h3>
+<form method="post" action="/diag/add">
+    <label>File</label><br>
+    <input type="text" name="diag_file"><br>
+    <br><br>
+    <input type="submit" value="Diagnosis">
 </form>
 
 <h3>Delete Node</h3>
@@ -29,8 +29,6 @@
     <br><br>
     <input type="submit" value="Submit">
 </form>
-
-
 
 <h3>Add Node3 to Node1</h3>
 <form method="post" action="/node1/node3/add">
@@ -49,17 +47,24 @@
 
 
 
-<h3>Resulting Cake .. Yo </h3>
+<h3>Resulting Specialty .. Yo </h3>
 <ul>    
-<% movies.forEach(function(movie){ %>
-    <li><%= movie.ids %></li>
+<% specialties.forEach(function(specialty){ %>
+    <li><%= specialty.name %></li>
 <% }) %>
 </ul>
 
-<h3>Resulting Topping .. Yo </h3>
+<h3>Resulting Subspecialty .. Yo </h3>
 <ul>    
-<% actors.forEach(function(movie){ %>
-    <li><%= movie.ids %></li>
+<% subspecialities.forEach(function(subspecialty){ %>
+    <li><%= subspecialty.name %></li>
+<% }) %>
+</ul>
+
+<h3>Resulting Diagnosis .. Yo </h3>
+<ul>    
+<% subspecialities.forEach(function(subspecialty){ %>
+    <li><%= subspecialty.id %></li>
 <% }) %>
 </ul>
 

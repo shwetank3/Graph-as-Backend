@@ -1,0 +1,44 @@
+{
+		"Specialty":
+			[
+				{ "name": "5001", 
+				  "Subspecialty":
+					[
+						{ "name": "1001", "Diagnosis": "Regular" },
+						{ "name": "1002", "Diagnosis": "Chocolate" },
+						{ "name": "1003", "Diagnosis": "Blueberry" },
+						{ "name": "1004", "Diagnosis": "Devil's Food" }
+					] },
+				{ "name": "5002", 
+				  "Subspecialty": 
+					[
+						{ "name": "1001", "Diagnosis": "Regular" },
+						{ "name": "1002", "Diagnosis": "Chocolate" }
+
+					] },
+				{ "name": "5005", 
+				  "Subspecialty": 
+					[
+						{ "name": "1006", "Diagnosis": "Sugar" },
+						{ "name": "1009", "Diagnosis": "Chocolate" },
+						{ "name": "1008", "Diagnosis": "Chocolate with Sprinkles" }
+					] },
+				{ "name": "5006", 
+				  "Subspecialty": 
+					[
+						{ "name": "1007", "Diagnosis": "Powdered Sugar" }
+					] },
+				{ "name": "5007", 
+				  "Subspecialty": 
+					[
+						{ "name": "1008", "Diagnosis": "Chocolate with Sprinkles" }
+					] },
+				{ "name": "5009", 
+				  "Subspecialty": 
+					[
+						{ "name": "1009", "Diagnosis": "Chocolate" }
+					] }
+				
+			]
+	}
+	

@@ -15,48 +15,42 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static(path.join(__dirname,'public')));
 
-var driver = neo4j.driver('bolt://localhost',neo4j.auth.basic("neo", "neo4j"))
+var driver = neo4j.driver('bolt://localhost',neo4j.auth.basic("neo", "neo"))
 var session = driver.session();
 
 app.get('/',function(req,res){
     session
-        .run("CREATE CONSTRAINT ON (m:Specialty) ASSERT m.id IS UNIQUE;");
-    session
-        .run("CREATE CONSTRAINT ON (n:Subspecialty) ASSERT n.id IS UNIQUE;");
-    session
-        .run("CREATE CONSTRAINT ON (o:Diagnosis) ASSERT o.id IS UNIQUE;");
-
-    session
-        .run('MATCH (n:Specialty) Return n limit 25')
+        .run('MATCH (n:Cake) Return n limit 25')
         .then(function(result){
-            var SpclArr = [];
+            var movieArr = [];
             result.records.forEach(function(record){
-                SpclArr.push({
+                movieArr.push({
                     id: record._fields[0].identity.low,
-                    name: record._fields[0].properties.name,
+                    val: record._fields[0].properties.val,
+                    ids: record._fields[0].properties.id
+                   // year: record._fields[0].properties.year
                 });
             });
 
-                
             session
-                .run('MATCH (n:Subspecialty) Return n limit 25')
+                .run('MATCH(n:Topping) Return n limit 25')
                 .then(function(result2){
-                    var SubspclArr = [];
+                    var actorArr = [];
                     result2.records.forEach(function(record){
-                        SubspclArr.push({
+                        actorArr.push({
                             id: record._fields[0].identity.low,
-                            name: record._fields[0].properties.name,
+                            val: record._fields[0].properties.val,
+                            ids: record._fields[0].properties.id
                         });
                     });
                     res.render('index',{
-                        specialties: SpclArr,
-                        subspecialities: SubspclArr
+                        movies: movieArr,
+                        actors: actorArr
                     });
                 })
                 .catch(function(err){
                     console.log(err);
-                });
-
+                });       
         })
         .catch(function(err){
             console.log(err);
@@ -64,15 +58,17 @@ app.get('/',function(req,res){
     //res.send('It works');
 });
 
-app.post('/spcl/add',function(req,res){
-    var upload_file = req.body.spcl_file;
+app.post('/node/add',function(req,res){
+    var upload_file = req.body.Node_file;
     var upload = "file:///U:/myapp/".concat(upload_file)
 
-    //"WITH {files} AS url CALL apoc.load.json(url) YIELD value as row CREATE (:Specialty {name:row.name})
+    var label = req.body.Node_label;
+    var properties = req.body.Node_pro;
+
     session
-        .run("WITH {files} AS url CALL apoc.load.json(url) YIELD value as row "
-        + " UNWIND row.Specialty as spec "
-        + " MERGE (:Specialty {name:spec.name})",{files:upload})
+        .run("CREATE CONSTRAINT ON (m:"+label+") ASSERT m.id IS UNIQUE;")
+    session
+        .run("WITH {files} AS url CALL apoc.load.json(url) YIELD value as row CREATE (:"+label+" {"+ properties +":row.id, name:row.name})",{files:upload})
         .then(function(result){
             res.redirect('/');
     
@@ -84,36 +80,18 @@ app.post('/spcl/add',function(req,res){
     res.redirect('/');
 });
 
-app.post('/subspcl/add',function(req,res){
-    var upload_file = req.body.subspcl_file;
+app.post('/subnode/add',function(req,res){
+    var upload_file = req.body.SubNode_file;
     var upload = "file:///U:/myapp/".concat(upload_file)
 
-    session
-        .run("WITH {files} AS url CALL apoc.load.json(url) YIELD value as row"
-        + " UNWIND row.Specialty as spec "
-        + " UNWIND spec.Subspecialty as subspec " 
-        + " MERGE (:Subspecialty {name:subspec.name})",{files:upload})
-        .then(function(result){
-            res.redirect('/');
-    
-            session.close();
-        })
-        .catch(function(err){
-            console.log(err);
-        });
-    res.redirect('/');
-});
-
-app.post('/diag/add',function(req,res){
-    var upload_file = req.body.diag_file;
-    var upload = "file:///U:/myapp/".concat(upload_file)
+    var label = req.body.SubNode_label;
+    var properties = req.body.SubNode_pro;
 
     session
-        .run("WITH {files} AS url CALL apoc.load.json(url) YIELD value as row "
-        + " UNWIND row.Specialty as spec "
-        + " UNWIND spec.Subspecialty as subspec "
-        //+ " UNWIND subspec.Diagnosis as diag "
-        + " MERGE (:Diagnosis {name:subspec.Diagnosis})",{files:upload})
+        .run("CREATE CONSTRAINT ON (m:"+label+") ASSERT m.id IS UNIQUE;")
+
+    session
+        .run("WITH {files} AS url CALL apoc.load.json(url) YIELD value as row UNWIND row.topping as top MERGE (:"+label+" {"+ properties +":top.id, type:top.type})",{files:upload})
         .then(function(result){
             res.redirect('/');
     
