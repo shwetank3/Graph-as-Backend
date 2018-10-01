@@ -26,7 +26,12 @@ app.get('/', function (req, res) {
         .run("CREATE CONSTRAINT ON (n:Subspecialty) ASSERT n.id IS UNIQUE;");
     session
         .run("CREATE CONSTRAINT ON (o:Diagnosis) ASSERT o.id IS UNIQUE;");
-    
+    session
+        .run("CREATE CONSTRAINT ON (p:Symptom) ASSERT p.id IS UNIQUE;");
+    session
+        .run("CREATE CONSTRAINT ON (q:Test) ASSERT q.id IS UNIQUE;");
+    session
+        .run("CREATE CONSTRAINT ON (r:Treatment) ASSERT r.id IS UNIQUE;");
 
     session
         .run('MATCH (n:Specialty) Return n limit 25')
@@ -129,7 +134,8 @@ app.post('/diag/add',function(req,res){
         .run("WITH {files} AS url CALL apoc.load.json(url) YIELD value as row "
         + " UNWIND row.Specialty as spec "
         + " UNWIND spec.Subspecialty as subspec "
-        + " MERGE (:Diagnosis {name:subspec.Diagnosis})",{files:upload})
+        + " UNWIND subspec.Diagnosis as diagnosis "
+        + " MERGE (:Diagnosis {name:diagnosis.name})",{files:upload})
         .then(function(result){
             res.redirect('/');
     
@@ -140,6 +146,30 @@ app.post('/diag/add',function(req,res){
         });
     res.redirect('/');
 });
+
+app.post('/detail/add', function (req, res) {
+    var upload_file = req.body.detail_file;
+    var upload = "file:///C:/Users/ssonal/Desktop/graph_app/".concat(upload_file)
+
+    session
+        .run("WITH {files} AS url CALL apoc.load.json(url) YIELD value as row "
+            + " UNWIND row.Specialty as spec "
+            + " UNWIND spec.Subspecialty as subspec "
+            + " UNWIND subspec.Diagnosis as diagnosis "
+            + " MERGE (:Symptom {name:diagnosis.symptom})"
+            + " MERGE (:Test {name:diagnosis.test})"
+            + " MERGE (:Treatment {name:diagnosis.treatment})", { files: upload })
+        .then(function (result) {
+            res.redirect('/');
+
+            session.close();
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
+    res.redirect('/');
+});
+
 
 
 app.post('/node/del',function(req,res){
@@ -189,7 +219,8 @@ app.post('/subspec/diag/add', function (req, res) {
         .run('WITH {files} AS url CALL apoc.load.json(url) YIELD value as row '
             + ' UNWIND row.Specialty as spec'
             + ' UNWIND spec.Subspecialty as subspec '
-        + ' WITH spec,subspec MATCH (m:Subspecialty) WHERE m.name = subspec.name MATCH (n:Diagnosis) WHERE n.name = subspec.Diagnosis MERGE (m)-[:treats]->(n)', { files: upload })
+            + ' UNWIND subspec.Diagnosis as diagnosis '
+            + ' WITH subspec,diagnosis MATCH (m:Subspecialty) WHERE m.name = subspec.name MATCH (n:Diagnosis) WHERE n.name = diagnosis.name MERGE (m)-[:treats]->(n)', { files: upload })
         .then(function (result) {
             res.redirect('/');
 
@@ -201,6 +232,33 @@ app.post('/subspec/diag/add', function (req, res) {
     res.redirect('/');
 });
 
+
+app.post('/diag/detail/add', function (req, res) {
+    var upload_file = req.body.Node_file;
+    var upload = "file:///C:/Users/ssonal/Desktop/graph_app/".concat(upload_file)
+
+    session
+        .run('WITH {files} AS url CALL apoc.load.json(url) YIELD value as row '
+            + ' UNWIND row.Specialty as spec'
+            + ' UNWIND spec.Subspecialty as subspec '
+            + ' UNWIND subspec.Diagnosis as diagnosis '
+            + ' WITH diagnosis MATCH (d:Diagnosis) WHERE d.name = diagnosis.name '
+            + ' MATCH (s:Symptom) WHERE s.name = diagnosis.symptom '
+            + ' MATCH (t:Test) WHERE t.name = diagnosis.test '
+            + ' MATCH (tt:Treatment) WHERE tt.name = diagnosis.treatment '
+            + ' MERGE (d)-[:showed]->(s) '
+            + ' MERGE (d)-[:conducted]->(t) '
+            + ' MERGE (d)-[:performed]->(tt)', { files: upload })
+        .then(function (result) {
+            res.redirect('/');
+
+            session.close();
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
+    res.redirect('/');
+});
 
 
 app.listen(7687);

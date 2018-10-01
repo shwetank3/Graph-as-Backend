@@ -1,52 +1,76 @@
 <h3>Add Specialty</h3>
 <form method="post" action="/spcl/add">
     <label>File</label><br>
-    <input type="text" name="spcl_file"><br>
-    <br><br>
+    <input type="text" name="spcl_file">
+    <br>
     <input type="submit" value="Specialty">
 </form>
+<br><br>
 
 <h3>Add Subspecialty</h3>
 <form method="post" action="/subspcl/add">
     <label>File</label><br>
-    <input type="text" name="subspcl_file"><br>
-    <br><br>
+    <input type="text" name="subspcl_file">
+    <br>
     <input type="submit" value="Subspecialty">
 </form>
+<br><br>
 
 <h3>Add Diagnosis</h3>
 <form method="post" action="/diag/add">
     <label>File</label><br>
-    <input type="text" name="diag_file"><br>
-    <br><br>
+    <input type="text" name="diag_file">
+    <br>
     <input type="submit" value="Diagnosis">
 </form>
+<br><br>
+
+<h3>Add Details</h3>
+<form method="post" action="/detail/add">
+    <label>File</label><br>
+    <input type="text" name="detail_file">
+    <br>
+    <input type="submit" value="Details">
+</form>
+<br><br>
+
+
 
 <h3>Delete Node</h3>
 <form method="post" action="/node/del">
     <label>Label</label><br>
     <input type="text" name="Node_label">
-    <br><br>
+    <br>
     <input type="submit" value="Submit">
 </form>
+<br><br>
 
-<h3>Add Specialty to Subspecialty</h3>
+<h3>Add Subspecialty to Specialty</h3>
 <form method="post" action="/spec/subspec/add">
     <label>File Name</label><br>
     <input type="text" name="Node_file">
-    <br><br>
+    <br>
     <input type="submit" value="Submit">
 </form>
+<br><br>
 
-<h3>Add Subspecialty to Diagnosis</h3>
+<h3>Add Diagnosis to Subspecialty</h3>
 <form method="post" action="/subspec/diag/add">
     <label>File Name</label><br>
     <input type="text" name="Node_file">
-    <br><br>
+    <br>
     <input type="submit" value="Submit">
 </form>
+<br><br>
 
-
+<h3>Add Details to Diagnosis</h3>
+<form method="post" action="/diag/detail/add">
+    <label>File Name</label><br>
+    <input type="text" name="Node_file">
+    <br>
+    <input type="submit" value="Submit">
+</form>
+<br><br>
 
 
 <h3>Resulting Specialty .. Yo </h3>

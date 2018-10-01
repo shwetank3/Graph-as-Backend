@@ -1,0 +1,92 @@
+{
+		"Specialty":
+			[
+				{ "name": "5001", 
+				  "Subspecialty":
+					[
+						{ "name": "1001", "Diagnosis": 
+										[ {     "name" : "Regular",
+										 	"symptom" : "A",
+										 	"test" : "abc",
+										 	"treatment" : "Aabc" }] },
+						{ "name": "1002", "Diagnosis": 
+										[ {     "name" : "Chocolate",
+										 	"symptom" : "C",
+										 	"test" : "cde",
+										 	"treatment" : "Ccde" }] },
+						{ "name": "1003", "Diagnosis": 
+										[ {     "name" : "Blueberry",
+										 	"symptom" : "B",
+										 	"test" : "bcd",
+										 	"treatment" : "Bbcd" }] },
+						{ "name": "1004", "Diagnosis": 
+										[ {     "name" : "Devil's Food",
+										 	"symptom" : "D",
+										 	"test" : "def",
+										 	"treatment" : "Ddef" }] }
+					] },
+				{ "name": "5002", 
+				  "Subspecialty": 
+					[
+						{ "name": "1001", "Diagnosis": 
+										[ {     "name" : "Regular",
+										 	"symptom" : "A",
+										 	"test" : "abc",
+										 	"treatment" : "Aabc" }] },
+						{ "name": "1002", "Diagnosis": 
+										[ {     "name" : "Chocolate",
+										 	"symptom" : "C",
+										 	"test" : "cde",
+										 	"treatment" : "Ccde" }] }
+
+					] },
+				{ "name": "5005", 
+				  "Subspecialty": 
+					[
+						{ "name": "1006", "Diagnosis": 
+										[ {     "name" : "Sugar",
+										 	"symptom" : "S",
+										 	"test" : "stu",
+										 	"treatment" : "Sstu" }] },
+						{ "name": "1009", "Diagnosis": 
+										[ {     "name" : "Chocolate",
+										 	"symptom" : "C",
+										 	"test" : "cde",
+										 	"treatment" : "Ccde" }] },
+						{ "name": "1008", "Diagnosis": 
+										[ {     "name" : "Chocolate with Sprinkles",
+										 	"symptom" : "CS",
+										 	"test" : "cdestu",
+										 	"treatment" : "CcdeSstu" }] }
+					] },
+				{ "name": "5006", 
+				  "Subspecialty": 
+					[
+						{ "name": "1007", "Diagnosis": 
+										[ {     "name" : "Powdered Sugar",
+										 	"symptom" : "PS",
+										 	"test" : "pqrstu",
+										 	"treatment" : "PpqrSstu" }]  }
+					] },
+				{ "name": "5007", 
+				  "Subspecialty": 
+					[
+						{ "name": "1008", "Diagnosis": 
+										[ {     "name" : "Chocolate with Sprinkles",
+										 	"symptom" : "CS",
+										 	"test" : "cdestu",
+										 	"treatment" : "CcdeSstu" }]  }
+					] },
+				{ "name": "5009", 
+				  "Subspecialty": 
+					[
+						{ "name": "1009", "Diagnosis": 
+										[ {     "name" : "Chocolate",
+										 	"symptom" : "C",
+										 	"test" : "cde",
+										 	"treatment" : "Ccde" }] }
+					] }
+				
+			]
+	}
+	
