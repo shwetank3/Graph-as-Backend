@@ -26,12 +26,7 @@ app.get('/', function (req, res) {
         .run("CREATE CONSTRAINT ON (n:Subspecialty) ASSERT n.id IS UNIQUE;");
     session
         .run("CREATE CONSTRAINT ON (o:Diagnosis) ASSERT o.id IS UNIQUE;");
-    session
-        .run("CREATE CONSTRAINT ON (p:Symptom) ASSERT p.id IS UNIQUE;");
-    session
-        .run("CREATE CONSTRAINT ON (q:Test) ASSERT q.id IS UNIQUE;");
-    session
-        .run("CREATE CONSTRAINT ON (r:Treatment) ASSERT r.id IS UNIQUE;");
+    
 
     session
         .run('MATCH (n:Specialty) Return n limit 25')
