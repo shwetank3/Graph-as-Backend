@@ -25,7 +25,7 @@ app.get('/',function(req,res){
         .run("CREATE CONSTRAINT ON (n:Subspecialty) ASSERT n.id IS UNIQUE;");
     session
         .run("CREATE CONSTRAINT ON (o:Diagnosis) ASSERT o.id IS UNIQUE;");
-
+///Wow, check sync git and VS
     session
         .run('MATCH (n:Specialty) Return n limit 25')
         .then(function(result){
