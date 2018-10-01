@@ -30,14 +30,16 @@
     <input type="submit" value="Submit">
 </form>
 
-<h3>Add Node3 to Node1</h3>
-<form method="post" action="/node1/node3/add">
-    <label>Node1 val name</label><br>
-    <input type="text" name="Node1_val"><br>
-    <label>Node3 val name</label><br>
-    <input type="text" name="Node3_val"><br>
-    <label>Relationship Name</label><br>
-    <input type="text" name="Node_rel"><br>
+<h3>Add Specialty to Subspecialty</h3>
+<form method="post" action="/spec/subspec/add">
+    <label>File Name</label><br>
+    <input type="text" name="Node_file">
+    <br><br>
+    <input type="submit" value="Submit">
+</form>
+
+<h3>Add Subspecialty to Diagnosis</h3>
+<form method="post" action="/subspec/diag/add">
     <label>File Name</label><br>
     <input type="text" name="Node_file">
     <br><br>
@@ -63,8 +65,8 @@
 
 <h3>Resulting Diagnosis .. Yo </h3>
 <ul>    
-<% subspecialities.forEach(function(subspecialty){ %>
-    <li><%= subspecialty.id %></li>
+<% diagnosiss.forEach(function(diag){ %>
+    <li><%= diag.name %></li>
 <% }) %>
 </ul>
 

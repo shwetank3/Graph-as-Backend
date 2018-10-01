@@ -6,7 +6,7 @@ var neo4j = require('neo4j-driver').v1;
 
 var app = express();
 
-// View Engine
+
 app.set('views',path.join(__dirname,'views'));
 app.set('view engine','ejs');
 
@@ -18,13 +18,20 @@ app.use(express.static(path.join(__dirname,'public')));
 var driver = neo4j.driver('bolt://localhost',neo4j.auth.basic("neo", "neo4j"))
 var session = driver.session();
 
-app.get('/',function(req,res){
+app.get('/', function (req, res) {
+
     session
         .run("CREATE CONSTRAINT ON (m:Specialty) ASSERT m.id IS UNIQUE;");
     session
         .run("CREATE CONSTRAINT ON (n:Subspecialty) ASSERT n.id IS UNIQUE;");
     session
         .run("CREATE CONSTRAINT ON (o:Diagnosis) ASSERT o.id IS UNIQUE;");
+    session
+        .run("CREATE CONSTRAINT ON (p:Symptom) ASSERT p.id IS UNIQUE;");
+    session
+        .run("CREATE CONSTRAINT ON (q:Test) ASSERT q.id IS UNIQUE;");
+    session
+        .run("CREATE CONSTRAINT ON (r:Treatment) ASSERT r.id IS UNIQUE;");
 
     session
         .run('MATCH (n:Specialty) Return n limit 25')
@@ -48,10 +55,25 @@ app.get('/',function(req,res){
                             name: record._fields[0].properties.name,
                         });
                     });
-                    res.render('index',{
-                        specialties: SpclArr,
-                        subspecialities: SubspclArr
-                    });
+                    session
+                        .run('MATCH (n:Diagnosis) Return n limit 25')
+                        .then(function (result3){ 
+                            var DiagnosisArr = [];
+                            result3.records.forEach(function (record) {
+                                DiagnosisArr.push({
+                                    id: record._fields[0].identity.low,
+                                    name: record._fields[0].properties.name,
+                                });
+                            });
+                            res.render('index', {
+                                specialties: SpclArr,
+                                subspecialities: SubspclArr,
+                                diagnosiss: DiagnosisArr
+                            });
+                        })
+                        .catch(function (err) {
+                            console.log(err);
+                        });
                 })
                 .catch(function(err){
                     console.log(err);
@@ -66,7 +88,7 @@ app.get('/',function(req,res){
 
 app.post('/spcl/add',function(req,res){
     var upload_file = req.body.spcl_file;
-    var upload = "file:///U:/myapp/".concat(upload_file)
+    var upload = "file:///C:/Users/ssonal/Desktop/graph_app/".concat(upload_file)
 
     //"WITH {files} AS url CALL apoc.load.json(url) YIELD value as row CREATE (:Specialty {name:row.name})
     session
@@ -86,7 +108,7 @@ app.post('/spcl/add',function(req,res){
 
 app.post('/subspcl/add',function(req,res){
     var upload_file = req.body.subspcl_file;
-    var upload = "file:///U:/myapp/".concat(upload_file)
+    var upload = "file:///C:/Users/ssonal/Desktop/graph_app/".concat(upload_file)
 
     session
         .run("WITH {files} AS url CALL apoc.load.json(url) YIELD value as row"
@@ -106,13 +128,12 @@ app.post('/subspcl/add',function(req,res){
 
 app.post('/diag/add',function(req,res){
     var upload_file = req.body.diag_file;
-    var upload = "file:///U:/myapp/".concat(upload_file)
+    var upload = "file:///C:/Users/ssonal/Desktop/graph_app/".concat(upload_file)
 
     session
         .run("WITH {files} AS url CALL apoc.load.json(url) YIELD value as row "
         + " UNWIND row.Specialty as spec "
         + " UNWIND spec.Subspecialty as subspec "
-        //+ " UNWIND subspec.Diagnosis as diag "
         + " MERGE (:Diagnosis {name:subspec.Diagnosis})",{files:upload})
         .then(function(result){
             res.redirect('/');
@@ -144,20 +165,15 @@ app.post('/node/del',function(req,res){
 
 
 
-app.post('/node1/node3/add',function(req,res){
-    var valin1 = req.body.Node1_val;
-    var valin3 = req.body.Node3_val;
-    
-    var relation = req.body.Node_rel;
-
+app.post('/spec/subspec/add',function(req,res){  
     var upload_file = req.body.Node_file;
-    var upload = "file:///U:/myapp/".concat(upload_file)
+    var upload = "file:///C:/Users/ssonal/Desktop/graph_app/".concat(upload_file)
 
-    //('MATCH (n:Node1 {val:{value1}}),(m:Node3 {val:{value3}}) MERGE (m:Node1)-[:belong]->(n:Node3) RETURN n,m',{value1:valin1,value3:valin3})
     session
-        .run('WITH {files} AS url'+
-        ' CALL apoc.load.json(url) YIELD value as row UNWIND row.topping as top'+
-        ' WITH row,top MATCH (m:Topping) WHERE m.id = top.id MATCH (n:Cake) WHERE n.id = row.id MERGE (m)-[:'+relation+']->(n)',{files:upload})
+        .run('WITH {files} AS url CALL apoc.load.json(url) YIELD value as row '
+        + ' UNWIND row.Specialty as spec'
+        + ' UNWIND spec.Subspecialty as subspec '
+        + ' WITH spec,subspec MATCH (m:Specialty) WHERE m.name = spec.name MATCH (n:Subspecialty) WHERE n.name = subspec.name MERGE (m)-[:has]->(n)',{files:upload})
         .then(function(result){
             res.redirect('/');
     
@@ -168,6 +184,28 @@ app.post('/node1/node3/add',function(req,res){
         });
     res.redirect('/');
 });
+
+
+app.post('/subspec/diag/add', function (req, res) {
+    var upload_file = req.body.Node_file;
+    var upload = "file:///C:/Users/ssonal/Desktop/graph_app/".concat(upload_file)
+
+    session
+        .run('WITH {files} AS url CALL apoc.load.json(url) YIELD value as row '
+            + ' UNWIND row.Specialty as spec'
+            + ' UNWIND spec.Subspecialty as subspec '
+        + ' WITH spec,subspec MATCH (m:Subspecialty) WHERE m.name = subspec.name MATCH (n:Diagnosis) WHERE n.name = subspec.Diagnosis MERGE (m)-[:treats]->(n)', { files: upload })
+        .then(function (result) {
+            res.redirect('/');
+
+            session.close();
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
+    res.redirect('/');
+});
+
 
 
 app.listen(7687);
