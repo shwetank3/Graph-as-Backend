@@ -104,8 +104,8 @@ app.post('/node/del',function(req,res){
 });
 
 // RELATIONSHIP NOMENCLATURE
-// Specialty has Subspecialty
-// Subspecialty treats Disgnosis
+// Specialty treats Disgnosis
+// Disgnosis belongs_to Subspecialty
 // Diagnosis showed symptoms
 // Diagnosis conducted test
 // Diagnosis performed treatment
@@ -118,18 +118,18 @@ app.post('/json/add', function (req, res) {
     session
         .run("WITH {files} AS url CALL apoc.load.json(url) YIELD value as row "
             + " UNWIND row.Specialty as spec "
-            + " UNWIND spec.Subspecialty as subspec "
-            + " UNWIND subspec.Diagnosis as diagnosis "
+            + " UNWIND spec.Diagnosis as diagnosis "
+            + " UNWIND diagnosis.Subspecialty as subspec "
             + " MERGE (:Specialty {name:spec.name})"
-            + " MERGE (:Subspecialty {name:subspec.name})"
             + " MERGE (:Diagnosis {name:diagnosis.name})"
+            + " MERGE (:Subspecialty {name:subspec.name})"
             + " MERGE (:Symptom {name:diagnosis.symptom})"
             + " MERGE (:Test {name:diagnosis.test})"
             + " MERGE (:Treatment {name:diagnosis.treatment})"
-            + " WITH spec,subspec,diagnosis "
-            + " MATCH (s:Specialty) WHERE s.name = spec.name MATCH (ss:Subspecialty) WHERE ss.name = subspec.name MATCH (d:Diagnosis) WHERE d.name = diagnosis.name "
-            + " MERGE (s)-[:has]->(ss)"
-            + " MERGE (ss)-[:treats]->(d)"
+            + " WITH spec,diagnosis,subspec "
+            + " MATCH (s:Specialty) WHERE s.name = spec.name MATCH (d:Diagnosis) WHERE d.name = diagnosis.name MATCH (ss:Subspecialty) WHERE ss.name = subspec.name  "
+            + " MERGE (s)-[:treats]->(d)"
+            + " MERGE (d)-[:belongs_to]->(ss)"
             + " WITH diagnosis MATCH (d:Diagnosis) WHERE d.name = diagnosis.name "
             + " MATCH (sy:Symptom) WHERE sy.name = diagnosis.symptom "
             + " MATCH (t:Test) WHERE t.name = diagnosis.test "
@@ -149,53 +149,153 @@ app.post('/json/add', function (req, res) {
 });
 
 
-app.post('/filter/subspeciality', function (req, res) {
-    var value = req.body.spcl;
-    console.log(value)
-    session
-        .run("MATCH (s:Specialty)-[:has]->(n) WHERE s.name='"+value+"' RETURN n")
-        .then(function (result) {
+app.post('/filter/specialty', function (req, res) {
+    var value_diag = req.body.diag;
+    var value_subspcl = req.body.subspcl;
+    console.log(value_diag)
+    console.log(value_subspcl)
+    if (value_diag) {
+        session
+            .run("MATCH (s:Specialty)-[]->(d:Diagnosis) WHERE d.name='" + value_diag + "' RETURN s")
+            .then(function (result) {
 
-            var FSubSpclArr = [];
-            result.records.forEach(function (record) {
-                FSubSpclArr.push({
-                    id: record._fields[0].identity.low,
-                    name: record._fields[0].properties.name,
+                var FSpecialty = [];
+                result.records.forEach(function (record) {
+                    FSpecialty.push({
+                        id: record._fields[0].identity.low,
+                        name: record._fields[0].properties.name,
+                    });
                 });
+                console.log(FSpecialty)
+                res.render('result', {
+                    answers: FSpecialty,
+                });
+            })
+            .catch(function (err) {
+                console.log(err);
             });
-            console.log(FSubSpclArr)
-            res.render('result', {
-                answers: FSubSpclArr,
+    } else {
+        session
+            .run("MATCH (s:Specialty)-[]->()-[]->(ss:Subspecialty) WHERE ss.name='" + value_subspcl + "' RETURN s")
+            .then(function (result) {
+
+                var FSpecialty = [];
+                result.records.forEach(function (record) {
+                    FSpecialty.push({
+                        id: record._fields[0].identity.low,
+                        name: record._fields[0].properties.name,
+                    });
+                });
+                console.log(FSpecialty)
+                res.render('result', {
+                    answers: FSpecialty,
+                });
+            })
+            .catch(function (err) {
+                console.log(err);
             });
-        })
-        .catch(function (err) {
-            console.log(err);
-        });
+    }
 });
+
+
+
 
 app.post('/filter/diagnosis', function (req, res) {
-    var value = req.body.subspcl;
-    console.log(value)
-    session
-        .run("MATCH (ss:Subspecialty)-[:treats]->(n) WHERE ss.name='" + value + "' RETURN n")
-        .then(function (result) {
+    var value_spcl = req.body.spcl;
+    var value_subspcl = req.body.subspcl;
+    console.log(value_subspcl)
+    console.log(value_spcl)
+    if (value_spcl) {
+        session
+            .run("MATCH (s:Specialty)-[:treats]->(d) WHERE s.name='" + value_spcl + "' RETURN d")
+            .then(function (result) {
 
-            var FDiagnosis = [];
-            result.records.forEach(function (record) {
-                FDiagnosis.push({
-                    id: record._fields[0].identity.low,
-                    name: record._fields[0].properties.name,
+                var FDiagnosis = [];
+                result.records.forEach(function (record) {
+                    FDiagnosis.push({
+                        id: record._fields[0].identity.low,
+                        name: record._fields[0].properties.name,
+                    });
                 });
+                console.log(FDiagnosis)
+                res.render('result', {
+                    answers: FDiagnosis,
+                });
+            })
+            .catch(function (err) {
+                console.log(err);
             });
-            console.log(FDiagnosis)
-            res.render('result', {
-                answers: FDiagnosis,
+    } else {
+        session
+            .run("MATCH (d:Diagnosis)-[]->(ss:Subspecialty) WHERE ss.name='" + value_subspcl + "' RETURN d")
+            .then(function (result) {
+
+                var FDiagnosis = [];
+                result.records.forEach(function (record) {
+                    FDiagnosis.push({
+                        id: record._fields[0].identity.low,
+                        name: record._fields[0].properties.name,
+                    });
+                });
+                console.log(FDiagnosis)
+                res.render('result', {
+                    answers: FDiagnosis,
+                });
+            })
+            .catch(function (err) {
+                console.log(err);
             });
-        })
-        .catch(function (err) {
-            console.log(err);
-        });
+    }
 });
+
+
+
+app.post('/filter/subspeciality', function (req, res) {
+    var value_diag = req.body.diag;
+    var value_spcl = req.body.spcl;
+    console.log(value_diag)
+    console.log(value_spcl)
+    if (value_diag) {
+        session
+            .run("MATCH (d:Diagnosis)-[:belongs_to]->(ss) WHERE d.name='" + value_diag + "' RETURN ss")
+            .then(function (result) {
+                var FSubSpclArr = [];
+                result.records.forEach(function (record) {
+                    FSubSpclArr.push({
+                        id: record._fields[0].identity.low,
+                        name: record._fields[0].properties.name,
+                    });
+                });
+                console.log(FSubSpclArr)
+                res.render('result', {
+                    answers: FSubSpclArr,
+                });
+            })
+            .catch(function (err) {
+                console.log(err);
+            });
+    } else {
+        session
+            .run("MATCH (s:Specialty)-[]->()-[]->(ss:Subspecialty) WHERE s.name='" + value_spcl + "' RETURN ss")
+            .then(function (result) {
+                var FSubSpclArr = [];
+                result.records.forEach(function (record) {
+                    FSubSpclArr.push({
+                        id: record._fields[0].identity.low,
+                        name: record._fields[0].properties.name,
+                    });
+                });
+                console.log(FSubSpclArr)
+                res.render('result', {
+                    answers: FSubSpclArr,
+                });
+            })
+            .catch(function (err) {
+                console.log(err);
+            });}
+});
+
+
 
 app.post('/fetch', function (req, res) {
     var value = req.body.label;
