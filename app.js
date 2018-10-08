@@ -19,7 +19,7 @@ var driver = neo4j.driver('bolt://localhost',neo4j.auth.basic("neo", "neo4j"))
 var session = driver.session();
 
 app.get('/', function (req, res) {
-
+    
     session
         .run("CREATE CONSTRAINT ON (m:Specialty) ASSERT m.id IS UNIQUE;");
     session
@@ -56,7 +56,7 @@ app.get('/', function (req, res) {
                         });
                     });
                     session
-                        .run('MATCH (n:Diagnosis) Return n limit 25')
+                        .run("MATCH (s:Specialty)-[:has]->(n) WHERE s.name='5001' RETURN n")
                         .then(function (result3){ 
                             var DiagnosisArr = [];
                             result3.records.forEach(function (record) {
@@ -112,6 +112,7 @@ app.post('/node/del',function(req,res){
 
 app.post('/json/add', function (req, res) {
     var upload_file = req.body.json_file;
+    console.log(upload_file)
     var upload = "file:///C:/Users/ssonal/Desktop/graph_app/".concat(upload_file)
 
     session
@@ -147,6 +148,79 @@ app.post('/json/add', function (req, res) {
     res.redirect('/');
 });
 
+
+app.post('/filter/subspeciality', function (req, res) {
+    var value = req.body.spcl;
+    console.log(value)
+    session
+        .run("MATCH (s:Specialty)-[:has]->(n) WHERE s.name='"+value+"' RETURN n")
+        .then(function (result) {
+
+            var FSubSpclArr = [];
+            result.records.forEach(function (record) {
+                FSubSpclArr.push({
+                    id: record._fields[0].identity.low,
+                    name: record._fields[0].properties.name,
+                });
+            });
+            console.log(FSubSpclArr)
+            res.render('result', {
+                answers: FSubSpclArr,
+            });
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
+});
+
+app.post('/filter/diagnosis', function (req, res) {
+    var value = req.body.subspcl;
+    console.log(value)
+    session
+        .run("MATCH (ss:Subspecialty)-[:treats]->(n) WHERE ss.name='" + value + "' RETURN n")
+        .then(function (result) {
+
+            var FDiagnosis = [];
+            result.records.forEach(function (record) {
+                FDiagnosis.push({
+                    id: record._fields[0].identity.low,
+                    name: record._fields[0].properties.name,
+                });
+            });
+            console.log(FDiagnosis)
+            res.render('result', {
+                answers: FDiagnosis,
+            });
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
+});
+
+app.post('/fetch', function (req, res) {
+    var value = req.body.label;
+    console.log(value)
+    session
+        .run("MATCH (n:"+value+") RETURN n")
+        .then(function (result) {
+
+            var Fetchres = [];
+            result.records.forEach(function (record) {
+                Fetchres.push({
+                    id: record._fields[0].identity.low,
+                    name: record._fields[0].properties.name
+                });
+            });
+            console.log(Fetchres)
+            res.render('result', {
+                answers: Fetchres,
+            });
+            session.close();
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
+});
 
 
 app.listen(7687);
