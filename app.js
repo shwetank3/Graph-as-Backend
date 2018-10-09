@@ -323,6 +323,26 @@ app.post('/fetch', function (req, res) {
 });
 
 
+app.post('/update', function (req, res) {
+    var label = req.body.label;
+    var property = req.body.property;
+    var old_val = req.body.old_val;
+    var new_val = req.body.new_val;
+
+    session
+        .run("MATCH (n:" + label + ") WHERE n." + property + " = '" + old_val + "' SET n." + property + " = '" + new_val + "' RETURN n")
+        .then(function (result) {
+            res.redirect('/');
+
+            session.close();
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
+    res.redirect('/');
+});
+
+
 app.listen(7687);
 console.log('Server started on Port 7687');
 
