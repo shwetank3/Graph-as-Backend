@@ -133,6 +133,84 @@ app.post('/json/add', function (req, res) {
 });
 
 
+app.post('/add/node', function (req, res) {
+    var label = req.body.label;
+    var value = req.body.value;
+
+    session
+        .run("MERGE (n:" + label + " {name : '"+value+"'})  RETURN n")
+        .then(function (result) {
+            res.redirect('/');
+
+            session.close();
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
+    res.redirect('/');
+});
+
+app.post('/add/property', function (req, res) {
+    var label = req.body.label;
+    var property = req.body.property;
+
+    session
+        .run("MATCH (n:" + label + ") SET n." + property +" = ''")
+        .then(function (result) {
+            res.redirect('/');
+
+            session.close();
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
+    res.redirect('/');
+});
+
+app.post('/set/property', function (req, res) {
+    var label = req.body.label;
+    var name = req.body.name;
+    var property = req.body.property;
+    var value = req.body.value;
+
+    session
+        .run("MATCH (n:" + label + ") WHERE n.name = '"+ name +"' SET n." + property + " = '"+value+"'")
+        .then(function (result) {
+            res.redirect('/');
+
+            session.close();
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
+    res.redirect('/');
+});
+
+
+app.post('/add/rel', function (req, res) {
+    var label1 = req.body.label1;
+    var label2 = req.body.label2;
+    var relation = req.body.relation;
+    var value1 = req.body.value1;
+    var value2 = req.body.value2;
+    var property = req.body.property;
+
+    session
+        .run("MATCH (n:" + label1 + "),(m:" + label2 + ") WHERE n." + property + " = '" + value1 + "' and m." + property + " = '" + value2 + "' WITH n,m MERGE (n)-[:"+ relation +"]->(m)")
+        .then(function (result) {
+            res.redirect('/');
+
+            session.close();
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
+    res.redirect('/');
+});
+
+
+
+
 app.post('/filter/specialty', function (req, res) {
     var value_diag = req.body.diag;
     var value_subspcl = req.body.subspcl;
@@ -328,7 +406,7 @@ app.post('/update', function (req, res) {
 
 
 
-app.post('/node/del', function (req, res) {
+app.post('/del/node', function (req, res) {
     var label = req.body.label;
     var property = req.body.property;
     var value = req.body.value;
@@ -346,7 +424,7 @@ app.post('/node/del', function (req, res) {
     res.redirect('/');
 });
 
-app.post('/rel/del', function (req, res) {
+app.post('/del/rel', function (req, res) {
     var label1 = req.body.label1;
     var label2 = req.body.label2;
     var property = req.body.property;

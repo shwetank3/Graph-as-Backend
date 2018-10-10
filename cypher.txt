@@ -1,0 +1,79 @@
+############### Merge single node with label
+#Create a node with label wow if it doesnt exist
+MERGE (n:Wow) Return n
+
+#It does nothing, since label exist, returns all 6 nodes
+MERGE (n:Specialty) RETURN n
+
+
+############### Merge single node with properties
+# It does nothing, since specialty exists, returns just one node
+MERGE (n {name:"5001"}) return n
+
+# It creates a new node with properties
+MERGE (n {name:"5001", prop : 'asd'}) return n
+
+
+############### Merge single node with label and properties
+# It does nothing
+MERGE (n:Specialty {name:"5001"}) return n
+
+# It creates a new node with properties
+MERGE (n:Specialty {name:"5001", prop : 'asd'}) return n
+
+
+############### Merge a node and set properties if the node needs to be created.
+# It does nothing, returns all specialty
+MERGE (n:Specialty) ON CREATE SET n.name = '5001' return n
+
+# It does nothing, returns all specialty
+MERGE (n:Specialty) ON CREATE SET n.name = '2000' return n
+
+# It does nothing, returns the node
+MERGE (n:Specialty {name:"5001"}) ON CREATE SET n.name = '5001' return n
+
+# It does nothing, returns the node
+MERGE (n:Specialty {name:"5001"}) ON CREATE SET n.name = '2000' return n
+
+# It does nothing, returns the node
+MERGE (n:Specialty {name:"5001"}) ON CREATE SET n.wow = '2000' return n
+
+# It creates a new node, returns the node with two properties name and wow
+MERGE (n:Specialty {name:"2000"}) ON CREATE SET n.wow = '2000' return n
+
+# It creates a node and returns with name 5001 ---- Here it created a node, since created then changed the name property to 5001 and hence 2 nodes with name 5001
+MERGE (n:Specialty {name:"2000"}) ON CREATE SET n.name = '5001' return n
+
+############### Merging nodes and setting properties on found nodes.
+# It finds all the nodes and change the name properties to 5001
+MERGE (n:Specialty) ON MATCH SET n.name = '5001' return n
+
+# It finds all the nodes and change the name properties to 2000
+MERGE (n:Specialty) ON MATCH SET n.name = '2000' return n
+
+# It finds one node and change the name properties to 5001, if node already exists it does nothing
+MERGE (n:Specialty {name:"5001"}) ON MATCH SET n.name = '5001' return n
+# On repetition it does nothing
+
+# It converts 5001 into 2000 , returns the node  --- Here it found one node hence just changed the property to n.name
+MERGE (n:Specialty {name:"5001"}) ON MATCH SET n.name = '2000' return n
+
+It creates a new node with name 2000  --- Here it found nothing hence just created a node using merge
+MERGE (n:Specialty {name:"2000"}) ON MATCH SET n.name = '5001' return n
+
+###Properties
+# It does nothing, returns the node
+MERGE (n:Specialty {name:"5001"}) ON MATCH SET n.wow = '2000' return n
+
+# It creates a new node, returns the node with two properties name and wow
+MERGE (n:Specialty {name:"2000"}) ON MATCH SET n.wow = '3000' return n
+
+
+
+
+
+
+
+
+
+

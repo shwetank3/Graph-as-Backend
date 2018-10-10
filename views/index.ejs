@@ -7,6 +7,73 @@
 </form>
 <br><br>
 
+<h3>Add Node</h3>
+<form method="post" action="/add/node">
+    <label>Label</label><br>
+    <input type="text" name="label">
+    <br>
+	<label>Value</label><br>
+	<input type="text" name="value">
+    <br>
+    <input type="submit" value="Submit">
+</form>
+<br><br>
+
+<h3>Add Property</h3>
+<form method="post" action="/add/property">
+    <label>Label</label><br>
+    <input type="text" name="label">
+    <br>
+	<label>Property</label><br>
+	<input type="text" name="property">
+    <br>
+    <input type="submit" value="Submit">
+</form>
+<br><br>
+
+<h3>Set Property Value</h3>
+<form method="post" action="/set/property">
+    <label>Label</label><br>
+    <input type="text" name="label">
+    <br>
+	<label>name</label><br>
+    <input type="text" name="name">
+    <br>
+	<label>Property</label><br>
+	<input type="text" name="property">
+    <br>
+	<label>Value</label><br>
+	<input type="text" name="value">
+    <br>
+    <input type="submit" value="Submit">
+</form>
+<br><br>
+
+<h3>Add Relationship from Node1 to Node2</h3>
+<form method="post" action="/add/rel">
+    <label>Node1 - Label</label><br>
+    <input type="text" name="label1">
+    <br>
+	<label>Node1 - Value</label><br>
+	<input type="text" name="value1">
+    <br>
+	<label>Relation</label><br>
+	<input type="text" name="relation">
+    <br>
+	<label>Node2 - Label</label><br>
+    <input type="text" name="label2">
+    <br>
+	<label>Node2 - Value</label><br>
+	<input type="text" name="value2">
+    <br>
+	<label>Property</label><br>
+	<input type="text" name="property">
+    <br>
+    <input type="submit" value="Submit">
+</form>
+<br><br>
+
+
 <h3>Resulting Specialty .. Yo </h3>
 <ul>    
 <% specialties.forEach(function(specialty){ %>
@@ -92,7 +159,7 @@
 <br><br>
 
 <h3>Delete Node</h3>
-<form method="post" action="/node/del">
+<form method="post" action="/del/node">
     <label>Label</label><br>
     <input type="text" name="label">
     <br>
@@ -107,7 +174,7 @@
 <br><br>
 
 <h3>Delete Relationship</h3>
-<form method="post" action="/rel/del">
+<form method="post" action="/del/rel">
     <label>Node1 - Label</label><br>
     <input type="text" name="label1">
     <br>
