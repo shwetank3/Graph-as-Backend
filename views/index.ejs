@@ -7,15 +7,6 @@
 </form>
 <br><br>
 
-<h3>Delete Node</h3>
-<form method="post" action="/node/del">
-    <label>Label</label><br>
-    <input type="text" name="Node_label">
-    <br>
-    <input type="submit" value="Submit">
-</form>
-<br><br>
-
 <h3>Resulting Specialty .. Yo </h3>
 <ul>    
 <% specialties.forEach(function(specialty){ %>
@@ -97,5 +88,42 @@
 	<input type="text" name="new_val">
     <br>
 	<input type="submit" value="UPDATE">
+</form>
+<br><br>
+
+<h3>Delete Node</h3>
+<form method="post" action="/node/del">
+    <label>Label</label><br>
+    <input type="text" name="label">
+    <br>
+	<label>Property</label><br>
+	<input type="text" name="property">
+    <br>
+	<label>Value</label><br>
+	<input type="text" name="value">
+    <br>
+    <input type="submit" value="Submit">
+</form>
+<br><br>
+
+<h3>Delete Relationship</h3>
+<form method="post" action="/rel/del">
+    <label>Node1 - Label</label><br>
+    <input type="text" name="label1">
+    <br>
+	<label>Node1 - Value</label><br>
+	<input type="text" name="value1">
+    <br>
+	<label>Property</label><br>
+	<input type="text" name="property">
+    <br>
+	<label>Node2 - Label</label><br>
+    <input type="text" name="label2">
+    <br>
+	<label>Node2 - Value</label><br>
+	<input type="text" name="value2">
+    <br>
+	
+    <input type="submit" value="Submit">
 </form>
 <br><br>

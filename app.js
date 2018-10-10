@@ -87,22 +87,6 @@ app.get('/', function (req, res) {
 });
 
 
-app.post('/node/del',function(req,res){
-    var label = req.body.Node_label;
-
-    session
-        .run("MATCH (n:"+label+") DETACH DELETE n")
-        .then(function(result){
-            res.redirect('/');
-    
-            session.close();
-        })
-        .catch(function(err){
-            console.log(err);
-        });
-    res.redirect('/');
-});
-
 // RELATIONSHIP NOMENCLATURE
 // Specialty treats Disgnosis
 // Disgnosis belongs_to Subspecialty
@@ -331,6 +315,46 @@ app.post('/update', function (req, res) {
 
     session
         .run("MATCH (n:" + label + ") WHERE n." + property + " = '" + old_val + "' SET n." + property + " = '" + new_val + "' RETURN n")
+        .then(function (result) {
+            res.redirect('/');
+
+            session.close();
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
+    res.redirect('/');
+});
+
+
+
+app.post('/node/del', function (req, res) {
+    var label = req.body.label;
+    var property = req.body.property;
+    var value = req.body.value;
+
+    session
+        .run("MATCH (n:" + label + ") WHERE n." + property + " = '" + value + "' DETACH DELETE n")
+        .then(function (result) {
+            res.redirect('/');
+
+            session.close();
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
+    res.redirect('/');
+});
+
+app.post('/rel/del', function (req, res) {
+    var label1 = req.body.label1;
+    var label2 = req.body.label2;
+    var property = req.body.property;
+    var value1 = req.body.value1;
+    var value2 = req.body.value2;
+
+    session
+        .run("MATCH (n:" + label1 + ")-[r]->(m:" + label2 + ") WHERE n." + property + " = '" + value1 + "' and m." + property + " = '" + value2 + "' DELETE r")
         .then(function (result) {
             res.redirect('/');
 
