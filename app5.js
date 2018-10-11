@@ -44,7 +44,8 @@ app.get('/', function (req, res) {
                 });
             });
 
-             session
+                
+            session
                 .run('MATCH (n:Subspecialty) Return n limit 25')
                 .then(function(result2){
                     var SubspclArr = [];
@@ -54,15 +55,30 @@ app.get('/', function (req, res) {
                             name: record._fields[0].properties.name,
                         });
                     });
-                    res.render('index', {
-                        specialties: SpclArr,
-                        subspecialities: SubspclArr,
-                    })
+                    session
+                        .run("MATCH (s:Specialty)-[:has]->(n) WHERE s.name='5001' RETURN n")
+                        .then(function (result3){ 
+                            var DiagnosisArr = [];
+                            result3.records.forEach(function (record) {
+                                DiagnosisArr.push({
+                                    id: record._fields[0].identity.low,
+                                    name: record._fields[0].properties.name,
+                                });
+                            });
+                            res.render('index', {
+                                specialties: SpclArr,
+                                subspecialities: SubspclArr,
+                                diagnosiss: DiagnosisArr
+                            });
+                        })
+                        .catch(function (err) {
+                            console.log(err);
+                        });
                 })
                 .catch(function(err){
                     console.log(err);
                 });
-           
+
         })
         .catch(function(err){
             console.log(err);
@@ -117,9 +133,9 @@ app.post('/json/add', function (req, res) {
 });
 
 
-app.get('/add/node', function (req, res) {
-    var label = req.query.label;
-    var value = req.query.value;
+app.post('/add/node', function (req, res) {
+    var label = req.body.label;
+    var value = req.body.value;
 
     session
         .run("MERGE (n:" + label + " {name : '"+value+"'})  RETURN n")
