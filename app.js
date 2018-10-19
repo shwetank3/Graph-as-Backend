@@ -21,17 +21,17 @@ var session = driver.session();
 app.get('/', function (req, res) {
     
     session
-        .run("CREATE CONSTRAINT ON (m:Specialty) ASSERT m.id IS UNIQUE;");
+        .run("CREATE CONSTRAINT ON (m:Specialty) ASSERT m.name IS UNIQUE;");
     session
-        .run("CREATE CONSTRAINT ON (n:Subspecialty) ASSERT n.id IS UNIQUE;");
+        .run("CREATE CONSTRAINT ON (n:Subspecialty) ASSERT n.name IS UNIQUE;");
     session
-        .run("CREATE CONSTRAINT ON (o:Diagnosis) ASSERT o.id IS UNIQUE;");
+        .run("CREATE CONSTRAINT ON (o:Diagnosis) ASSERT o.name IS UNIQUE;");
     session
-        .run("CREATE CONSTRAINT ON (p:Symptom) ASSERT p.id IS UNIQUE;");
+        .run("CREATE CONSTRAINT ON (p:Symptom) ASSERT p.name IS UNIQUE;");
     session
-        .run("CREATE CONSTRAINT ON (q:Test) ASSERT q.id IS UNIQUE;");
+        .run("CREATE CONSTRAINT ON (q:Test) ASSERT q.name IS UNIQUE;");
     session
-        .run("CREATE CONSTRAINT ON (r:Treatment) ASSERT r.id IS UNIQUE;");
+        .run("CREATE CONSTRAINT ON (r:Treatment) ASSERT r.name IS UNIQUE;");
 
     session
         .run('MATCH (n:Specialty) Return n limit 25')
@@ -84,30 +84,30 @@ app.post('/json/add', function (req, res) {
     var upload = "file:///C:/Users/ssonal/Desktop/graph_app/".concat(upload_file)
 
     session
-        .run("WITH {files} AS url CALL apoc.load.json(url) YIELD value as row "
-            + " UNWIND row.Specialty as spec "
-            + " UNWIND spec.Diagnosis as diagnosis "
-            + " UNWIND diagnosis.Subspecialty as subspec "
-			+ " UNWIND diagnosis.Symptoms as symptom "
-			+ " UNWIND diagnosis.Tests as test "
-			+ " UNWIND diagnosis.Treatments as treatment "
-            + " MERGE (:Specialty {name:spec.name})"
-            + " MERGE (:Diagnosis {name:diagnosis.name})"
-            + " MERGE (:Subspecialty {name:subspec.name})"
-            + " MERGE (:Symptom {name:symptom})"
-            + " MERGE (:Test {name:test})"
-            + " MERGE (:Treatment {name:treatment})"
-            + " WITH spec,diagnosis,subspec, symptom, test, treatment "
-            + " MATCH (s:Specialty) WHERE s.name = spec.name MATCH (d:Diagnosis) WHERE d.name = diagnosis.name MATCH (ss:Subspecialty) WHERE ss.name = subspec.name  "
-            + " MERGE (s)-[:treats]->(d)"
-            + " MERGE (d)-[:belongs_to]->(ss)"
-            + " WITH diagnosis, symptom, test, treatment MATCH (d:Diagnosis) WHERE d.name = diagnosis.name "
-            + " MATCH (sy:Symptom) WHERE sy.name = symptom "
-            + " MATCH (t:Test) WHERE t.name = test "
-            + " MATCH (tt:Treatment) WHERE tt.name = treatment "
-            + " MERGE (d)-[:showed]->(sy) "
-            + " MERGE (d)-[:conducted]->(t) "
-            + " MERGE (d)-[:performed]->(tt)", { files: upload })
+        .run('WITH {files} AS url CALL apoc.load.json(url) YIELD value as row '
+            + ' UNWIND row.Specialty as spec '
+            + ' UNWIND spec.Diagnosis as diagnosis '
+            + ' UNWIND diagnosis.Subspecialty as subspec '
+			+ ' UNWIND diagnosis.Symptoms as symptom '
+			+ ' UNWIND diagnosis.Tests as test '
+			+ ' UNWIND diagnosis.Treatments as treatment '
+            + ' MERGE (:Specialty {name:spec.name})'
+            + ' MERGE (:Diagnosis {name:diagnosis.name})'
+            + ' MERGE (:Subspecialty {name:subspec.name})'
+            + ' MERGE (:Symptom {name:symptom})'
+            + ' MERGE (:Test {name:test})'
+            + ' MERGE (:Treatment {name:treatment})'
+            + ' WITH spec,diagnosis,subspec, symptom, test, treatment '
+            + ' MATCH (s:Specialty) WHERE s.name = spec.name MATCH (d:Diagnosis) WHERE d.name = diagnosis.name MATCH (ss:Subspecialty) WHERE ss.name = subspec.name  '
+            + ' MERGE (s)-[:treats]->(d)'
+            + ' MERGE (d)-[:belongs_to]->(ss)'
+            + ' WITH diagnosis, symptom, test, treatment MATCH (d:Diagnosis) WHERE d.name = diagnosis.name '
+            + ' MATCH (sy:Symptom) WHERE sy.name = symptom '
+            + ' MATCH (t:Test) WHERE t.name = test '
+            + ' MATCH (tt:Treatment) WHERE tt.name = treatment '
+            + ' MERGE (d)-[:showed]->(sy) '
+            + ' MERGE (d)-[:conducted]->(t) '
+            + ' MERGE (d)-[:performed]->(tt)', { files: upload })
         .then(function (result) {
             res.redirect('/');
 
@@ -125,7 +125,7 @@ app.get('/add/node', function (req, res) {
     var value = req.query.value;
 
     session
-        .run("MERGE (n:" + label + " {name : '"+value+"'})  RETURN n")
+        .run('MERGE (n:`' + label + '` {name : "'+value+'"})  RETURN n')
         .then(function (result) {
             res.redirect('/');
 
@@ -142,7 +142,7 @@ app.post('/add/property', function (req, res) {
     var property = req.body.property;
 
     session
-        .run("MATCH (n:" + label + ") SET n." + property +" = ''")
+        .run('MATCH (n:`' + label + '`) SET n.`' + property +'` = ""')
         .then(function (result) {
             res.redirect('/');
 
@@ -161,7 +161,7 @@ app.post('/set/property', function (req, res) {
     var value = req.body.value;
 
     session
-        .run("MATCH (n:" + label + ") WHERE n.name = '"+ name +"' SET n." + property + " = '"+value+"'")
+        .run('MATCH (n:`' + label + '`) WHERE n.name = "'+ name +'" SET n.`' + property + '` = "'+value+'"')
         .then(function (result) {
             res.redirect('/');
 
@@ -183,7 +183,7 @@ app.post('/add/rel', function (req, res) {
     var property = req.body.property;
 
     session
-        .run("MATCH (n:" + label1 + "),(m:" + label2 + ") WHERE n." + property + " = '" + value1 + "' and m." + property + " = '" + value2 + "' WITH n,m MERGE (n)-[:"+ relation +"]->(m)")
+        .run('MATCH (n:`' + label1 + '`),(m:`' + label2 + '`) WHERE n.`' + property + '` = "' + value1 + '" and m.`' + property + '` = "' + value2 + '" WITH n,m MERGE (n)-[:`'+ relation +'`]->(m)')
         .then(function (result) {
             res.redirect('/');
 
@@ -205,7 +205,7 @@ app.post('/filter/specialty', function (req, res) {
     console.log(value_subspcl)
     if (value_diag) {
         session
-            .run("MATCH (s:Specialty)-[]->(d:Diagnosis) WHERE d.name='" + value_diag + "' RETURN s")
+            .run('MATCH (s:Specialty)-[]->(d:Diagnosis) WHERE d.name="' + value_diag + '" RETURN s')
             .then(function (result) {
 
                 var FSpecialty = [];
@@ -225,7 +225,7 @@ app.post('/filter/specialty', function (req, res) {
             });
     } else {
         session
-            .run("MATCH (s:Specialty)-[]->()-[]->(ss:Subspecialty) WHERE ss.name='" + value_subspcl + "' RETURN s")
+            .run('MATCH (s:Specialty)-[]->()-[]->(ss:Subspecialty) WHERE ss.name="' + value_subspcl + '" RETURN s')
             .then(function (result) {
 
                 var FSpecialty = [];
@@ -256,7 +256,7 @@ app.post('/filter/diagnosis', function (req, res) {
     console.log(value_spcl)
     if (value_spcl) {
         session
-            .run("MATCH (s:Specialty)-[:treats]->(d) WHERE s.name='" + value_spcl + "' RETURN d")
+            .run('MATCH (s:Specialty)-[:treats]->(d) WHERE s.name="' + value_spcl + '" RETURN d')
             .then(function (result) {
 
                 var FDiagnosis = [];
@@ -276,7 +276,7 @@ app.post('/filter/diagnosis', function (req, res) {
             });
     } else {
         session
-            .run("MATCH (d:Diagnosis)-[]->(ss:Subspecialty) WHERE ss.name='" + value_subspcl + "' RETURN d")
+            .run('MATCH (d:Diagnosis)-[]->(ss:Subspecialty) WHERE ss.name="' + value_subspcl + '" RETURN d')
             .then(function (result) {
 
                 var FDiagnosis = [];
@@ -306,7 +306,7 @@ app.post('/filter/subspeciality', function (req, res) {
     console.log(value_spcl)
     if (value_diag) {
         session
-            .run("MATCH (d:Diagnosis)-[:belongs_to]->(ss) WHERE d.name='" + value_diag + "' RETURN ss")
+            .run('MATCH (d:Diagnosis)-[:belongs_to]->(ss) WHERE d.name="' + value_diag + '" RETURN ss')
             .then(function (result) {
                 var FSubSpclArr = [];
                 result.records.forEach(function (record) {
@@ -325,7 +325,7 @@ app.post('/filter/subspeciality', function (req, res) {
             });
     } else {
         session
-            .run("MATCH (s:Specialty)-[]->()-[]->(ss:Subspecialty) WHERE s.name='" + value_spcl + "' RETURN ss")
+            .run('MATCH (s:Specialty)-[]->()-[]->(ss:Subspecialty) WHERE s.name="' + value_spcl + '" RETURN ss')
             .then(function (result) {
                 var FSubSpclArr = [];
                 result.records.forEach(function (record) {
@@ -350,7 +350,7 @@ app.post('/fetch', function (req, res) {
     var value = req.body.label;
     console.log(value)
     session
-        .run("MATCH (n:"+value+") RETURN n")
+        .run('MATCH (n:`'+value+'`) RETURN n')
         .then(function (result) {
 
             var Fetchres = [];
@@ -379,7 +379,7 @@ app.post('/update', function (req, res) {
     var new_val = req.body.new_val;
 
     session
-        .run("MATCH (n:" + label + ") WHERE n." + property + " = '" + old_val + "' SET n." + property + " = '" + new_val + "' RETURN n")
+        .run('MATCH (n:`' + label + '`) WHERE n.`' + property + '` = "' + old_val + '" SET n.`' + property + '` = "' + new_val + '" RETURN n')
         .then(function (result) {
             res.redirect('/');
 
@@ -399,7 +399,7 @@ app.post('/del/node', function (req, res) {
     var value = req.body.value;
 
     session
-        .run("MATCH (n:" + label + ") WHERE n." + property + " = '" + value + "' DETACH DELETE n")
+        .run('MATCH (n:`' + label + '`) WHERE n.`' + property + '` = "' + value + '" DETACH DELETE n')
         .then(function (result) {
             res.redirect('/');
 
@@ -419,7 +419,7 @@ app.post('/del/rel', function (req, res) {
     var value2 = req.body.value2;
 
     session
-        .run("MATCH (n:" + label1 + ")-[r]->(m:" + label2 + ") WHERE n." + property + " = '" + value1 + "' and m." + property + " = '" + value2 + "' DELETE r")
+        .run('MATCH (n:`' + label1 + '`)-[r]->(m:`' + label2 + '`) WHERE n.`' + property + '` = "' + value1 + '" and m.`' + property + '` = "' + value2 + '" DELETE r')
         .then(function (result) {
             res.redirect('/');
 
