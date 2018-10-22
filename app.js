@@ -26,6 +26,10 @@ app.get('/', function (req, res) {
         .run("CREATE CONSTRAINT ON (n:Subspecialty) ASSERT n.name IS UNIQUE;");
     session
         .run("CREATE CONSTRAINT ON (o:Diagnosis) ASSERT o.name IS UNIQUE;");
+	session
+        .run("CREATE CONSTRAINT ON (cat:Category) ASSERT cat.name IS UNIQUE;");
+	session
+        .run("CREATE CONSTRAINT ON (cf:Clinicalfocus) ASSERT cf.name IS UNIQUE;");
     session
         .run("CREATE CONSTRAINT ON (p:Symptom) ASSERT p.name IS UNIQUE;");
     session
@@ -88,23 +92,26 @@ app.post('/json/add', function (req, res) {
             + ' UNWIND row.Specialty as spec '
             + ' UNWIND spec.Diagnosis as diagnosis '
             + ' UNWIND diagnosis.Subspecialty as subspec '
+			+ ' UNWIND diagnosis.clinicalFocus as clnfcs '
 			+ ' UNWIND diagnosis.Symptoms as symptom '
 			+ ' UNWIND diagnosis.Tests as test '
 			+ ' UNWIND diagnosis.Treatments as treatment '
             + ' MERGE (:Specialty {name:spec.name})'
             + ' MERGE (:Diagnosis {name:diagnosis.name})'
             + ' MERGE (:Subspecialty {name:subspec.name})'
+			+ ' MERGE (:Category {name:diagnosis.category})'
+			+ ' MERGE (:Clinicalfocus {name:clnfcs})'
             + ' MERGE (:Symptom {name:symptom})'
             + ' MERGE (:Test {name:test})'
             + ' MERGE (:Treatment {name:treatment})'
-            + ' WITH spec,diagnosis,subspec, symptom, test, treatment '
+            + ' WITH spec,diagnosis,subspec, clnfcs, symptom, test, treatment '
             + ' MATCH (s:Specialty) WHERE s.name = spec.name MATCH (d:Diagnosis) WHERE d.name = diagnosis.name MATCH (ss:Subspecialty) WHERE ss.name = subspec.name  '
-            + ' MERGE (s)-[:treats]->(d)'
-            + ' MERGE (d)-[:belongs_to]->(ss)'
-            + ' WITH diagnosis, symptom, test, treatment MATCH (d:Diagnosis) WHERE d.name = diagnosis.name '
-            + ' MATCH (sy:Symptom) WHERE sy.name = symptom '
-            + ' MATCH (t:Test) WHERE t.name = test '
-            + ' MATCH (tt:Treatment) WHERE tt.name = treatment '
+			+ ' MATCH (cat:Category) WHERE cat.name = diagnosis.category MATCH (cf:Clinicalfocus) WHERE cf.name = clnfcs '
+			+ ' MATCH (sy:Symptom) WHERE sy.name = symptom MATCH (t:Test) WHERE t.name = test MATCH (tt:Treatment) WHERE tt.name = treatment '
+            + ' MERGE (s)-[:treats]->(d) '
+            + ' MERGE (d)-[:has]->(ss) '
+			+ ' MERGE (d)-[:also_has]->(cf) '
+			+ ' MERGE (d)-[:belongs_to]->(cat) '
             + ' MERGE (d)-[:showed]->(sy) '
             + ' MERGE (d)-[:conducted]->(t) '
             + ' MERGE (d)-[:performed]->(tt)', { files: upload })
@@ -350,7 +357,7 @@ app.post('/fetch', function (req, res) {
     var value = req.body.label;
     console.log(value)
     session
-        .run('MATCH (n:`'+value+'`) RETURN n')
+        .run('MATCH (n:`'+value+'`) RETURN n ORDER BY n.name ASC')
         .then(function (result) {
 
             var Fetchres = [];
