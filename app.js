@@ -89,13 +89,13 @@ app.post('/json/add', function (req, res) {
 
     session
         .run('WITH {files} AS url CALL apoc.load.json(url) YIELD value as row '
-            + ' UNWIND row.Specialty as spec '
-            + ' UNWIND spec.Diagnosis as diagnosis '
-            + ' UNWIND diagnosis.Subspecialty as subspec '
-			+ ' UNWIND diagnosis.clinicalFocus as clnfcs '
-			+ ' UNWIND diagnosis.Symptoms as symptom '
-			+ ' UNWIND diagnosis.Tests as test '
-			+ ' UNWIND diagnosis.Treatments as treatment '
+            + ' UNWIND (CASE row.Specialty WHEN [] THEN [""] ELSE row.Specialty END)  as spec '
+            + ' UNWIND (CASE spec.Diagnosis WHEN [] THEN [""] ELSE spec.Diagnosis END)  as diagnosis '
+            + ' UNWIND (CASE diagnosis.Subspecialty WHEN [] THEN [{name:""}] ELSE diagnosis.Subspecialty END)  as subspec '
+			+ ' UNWIND (CASE diagnosis.clinicalFocus WHEN [] THEN [""] ELSE diagnosis.clinicalFocus END)  as clnfcs '
+			+ ' UNWIND (CASE diagnosis.Symptoms WHEN [] THEN [""] ELSE diagnosis.Symptoms END)  as symptom '
+			+ ' UNWIND (CASE diagnosis.Tests WHEN [] THEN [""] ELSE diagnosis.Tests END)  as test '
+			+ ' UNWIND (CASE diagnosis.Treatments WHEN [] THEN [""] ELSE diagnosis.Treatments END)  as treatment '
             + ' MERGE (:Specialty {name:spec.name})'
             + ' MERGE (:Diagnosis {name:diagnosis.name})'
             + ' MERGE (:Subspecialty {name:subspec.name})'
@@ -114,8 +114,18 @@ app.post('/json/add', function (req, res) {
 			+ ' MERGE (d)-[:belongs_to]->(cat) '
             + ' MERGE (d)-[:showed]->(sy) '
             + ' MERGE (d)-[:conducted]->(t) '
-            + ' MERGE (d)-[:performed]->(tt)', { files: upload })
+			+ ' MERGE (d)-[:performed]->(tt)', { files: upload })
         .then(function (result) {
+            res.redirect('/');
+
+            session.close();
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
+	session
+		.run(' MATCH (n) WHERE n.name = "" detach delete n')
+		.then(function (result) {
             res.redirect('/');
 
             session.close();
