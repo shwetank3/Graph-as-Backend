@@ -15,10 +15,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static(path.join(__dirname,'public')));
 
-var driver = neo4j.driver('bolt://localhost',neo4j.auth.basic("neo", "neo4j"))
+var driver = neo4j.driver('bolt://13.82.179.142:7687',neo4j.auth.basic("admin", "admin"))
 var session = driver.session();
 
-// Check again 
 
 app.get('/', function (req, res) {
     
@@ -224,7 +223,7 @@ app.post('/filter/specialty', function (req, res) {
     console.log(value_subspcl)
     if (value_diag) {
         session
-            .run('MATCH (s:Specialty)-[]->(d:Diagnosis) WHERE d.name="' + value_diag + '" RETURN s')
+            .run('MATCH (s:Specialty)-[]->(d:Diagnosis) WHERE d.name="' + value_diag + '" RETURN distinct s')
             .then(function (result) {
 
                 var FSpecialty = [];
@@ -244,7 +243,7 @@ app.post('/filter/specialty', function (req, res) {
             });
     } else {
         session
-            .run('MATCH (s:Specialty)-[]->()-[]->(ss:Subspecialty) WHERE ss.name="' + value_subspcl + '" RETURN s')
+            .run('MATCH (s:Specialty)-[]->()-[]->(ss:Subspecialty) WHERE ss.name="' + value_subspcl + '" RETURN distinct s')
             .then(function (result) {
 
                 var FSpecialty = [];
@@ -275,7 +274,7 @@ app.post('/filter/diagnosis', function (req, res) {
     console.log(value_spcl)
     if (value_spcl) {
         session
-            .run('MATCH (s:Specialty)-[:treats]->(d) WHERE s.name="' + value_spcl + '" RETURN d')
+            .run('MATCH (s:Specialty)-[:treats]->(d) WHERE s.name="' + value_spcl + '" RETURN distinct d')
             .then(function (result) {
 
                 var FDiagnosis = [];
@@ -295,7 +294,7 @@ app.post('/filter/diagnosis', function (req, res) {
             });
     } else {
         session
-            .run('MATCH (d:Diagnosis)-[]->(ss:Subspecialty) WHERE ss.name="' + value_subspcl + '" RETURN d')
+            .run('MATCH (d:Diagnosis)-[]->(ss:Subspecialty) WHERE ss.name="' + value_subspcl + '" RETURN distinct d')
             .then(function (result) {
 
                 var FDiagnosis = [];
@@ -325,7 +324,7 @@ app.post('/filter/subspeciality', function (req, res) {
     console.log(value_spcl)
     if (value_diag) {
         session
-            .run('MATCH (d:Diagnosis)-[:belongs_to]->(ss) WHERE d.name="' + value_diag + '" RETURN ss')
+            .run('MATCH (d:Diagnosis)-[:belongs_to]->(ss) WHERE d.name="' + value_diag + '" RETURN distinct ss')
             .then(function (result) {
                 var FSubSpclArr = [];
                 result.records.forEach(function (record) {
@@ -344,7 +343,7 @@ app.post('/filter/subspeciality', function (req, res) {
             });
     } else {
         session
-            .run('MATCH (s:Specialty)-[]->()-[]->(ss:Subspecialty) WHERE s.name="' + value_spcl + '" RETURN ss')
+            .run('MATCH (s:Specialty)-[]->()-[]->(ss:Subspecialty) WHERE s.name="' + value_spcl + '" RETURN distinct ss')
             .then(function (result) {
                 var FSubSpclArr = [];
                 result.records.forEach(function (record) {
